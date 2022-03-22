@@ -10,7 +10,7 @@ jobs:
     - os: osx
       language: shell
       before_install:
-        - brew install python --version 3.9.7
+        - brew install python3
         - ./fetchDependencies -v
     - name: "Python 3.8.0 on Windows"
       os: windows
