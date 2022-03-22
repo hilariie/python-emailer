@@ -14,6 +14,10 @@ jobs:
     - name: "Python 3.8.0 on Windows"
       os: windows
       language: shell
+      before_install:
+        - choco install python --version 3.8.0
+        - python -m pip install --upgrade pip wheel
+      env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 install:
   - pip install -r requirements.txt
 script:
