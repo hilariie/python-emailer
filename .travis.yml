@@ -8,10 +8,8 @@ python:
 jobs:
   include:
     - os: osx
+      osx_image: xcode12.5
       language: shell
-      before_install:
-        - brew install python3
-        - ./fetchDependencies -v
     - name: "Python 3.8.0 on Windows"
       os: windows
       language: shell
