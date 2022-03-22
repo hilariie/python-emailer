@@ -1,0 +1,9 @@
+LICENSE.txt
+README.md
+setup.py
+pymails.egg-info/PKG-INFO
+pymails.egg-info/SOURCES.txt
+pymails.egg-info/dependency_links.txt
+pymails.egg-info/top_level.txt
+pymails_sender/__init__.py
+pymails_sender/email_processing.py
