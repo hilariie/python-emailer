@@ -1,7 +1,6 @@
 import pytest
 import csv
 import json
-import mailtest
 import logging
 import socket
 from email_processing2 import EmailProcessor, PyMailer
@@ -209,8 +208,7 @@ def test_email_receiver_processing():
     ### Not sure about this test
     assert PyMailer(recipient_test_data, [''], '', '').email_receiver_processing() == ({'hilary': 'hil@email.ng', 'henry': 'henry@email.net'}, '')
     assert PyMailer(recipient_test_data_list, [''], '', '').email_receiver_processing() == ({'hilary': 'hilary@email.ng', 'henry': 'henry@email.com'}, '')
-    with pytest.raises(ValueError, match=r"Recipient data is empty"):
-        PyMailer('', [''], '', '').email_receiver_processing()
+
 
 
 

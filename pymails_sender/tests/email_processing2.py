@@ -294,10 +294,8 @@ class PyMailer(object):
         :return: cc emails as list and dictionary holding recipient names and emails as keys and values
         """
         cc = ''
-        if len(self.email_receivers) == 0:
-            raise ValueError('Recipient data is empty')
         # check if email_receiver has just recipient email addresses
-        elif len(self.email_receivers) == 1:
+        if len(self.email_receivers) == 1:
             recipient_dict = {}
             for index, emails in enumerate(self.email_receivers):
                 recipient_dict[index] = emails
