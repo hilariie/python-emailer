@@ -55,3 +55,72 @@ To contribute:
 
     `git push ..`
 * Create a pull request
+
+## How to use
+#### File attachments:
+___
+To attach files, pass in the path to the file.
+
+```python
+send_email(file_path='C:\\email\\attachments\\cv.pdf')
+```
+
+To attach multiple files, put all files in a directory and pass in the path to that directory in file_path.
+
+```python
+send_email(file_path='C:\\email\\attachments')
+```
+
+To display images in email, make sure you have cid:<image_name> in your email content/message where you want to display the image.
+An example is shown below
+
+```python
+Hello, 
+    <p>Below is the order of the meetup</p>
+    <p>
+    <img height="auto" src="cid:image_test" style=".." width="100"/>
+    </p>
+```
+
+pass in the exact cid value in the send_email method
+
+```python
+send_email(cid_img='image_test')
+```
+___
+
+#### String_:
+In a case where you have multiple recipients (names and email addresses) and  you wish to address them by their names, you just have to pass the greeting string.
+
+say email body = "Hello, \nWelcome to web3"
+
+```python
+send_email(string_='Hello')
+```
+
+email appears as:
+
+`Hello <recipient_name>`
+
+`Welcome to web3`
+___
+
+#### Recipient data:
+Recipient data can be read from various data and file types such as
+
+* sets - recipient email addresses
+* lists - recipient email addresses
+* tuples - recipient email addresses
+* dictionaries - recipient email addresses, names, and cc
+* string - recipient email addresses
+* .json files - recipient email addresses, names, and cc
+* .csv files - recipient email addresses, names, and cc
+
+##### .csv files:
+csv files should be arranged in this order below
+![screenshot](csv.png)
+
+##### .json files/dictionaries
+Dictionaries should be in one of the two structures
+- {names:[name1, name2, ...], emails:[email1, email2, ...], cc:[cc1, cc2, ...]}
+- {name1:email1, name2:email2, ...}
