@@ -1,3 +1,18 @@
+Metadata-Version: 2.1
+Name: python-emailer
+Version: 1.5.0
+Summary: Package that aids in sending emails to recipient(s)
+Home-page: https://github.com/hilariie/py-emailer
+Author: Akpu Chukwuma Hilary Jnr
+Author-email: holaryc@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # python-emailer
 python-emailer: python emailing toolkit
 
@@ -55,3 +70,4 @@ To contribute:
 
     `git push ..`
 * Create a pull request
+

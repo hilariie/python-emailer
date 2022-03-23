@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+python_emailer/__init__.py
+python_emailer/email_processing.py
+python_emailer.egg-info/PKG-INFO
+python_emailer.egg-info/SOURCES.txt
+python_emailer.egg-info/dependency_links.txt
+python_emailer.egg-info/top_level.txt
+python_emailer/tests/__init__.py
+python_emailer/tests/test_email_processing.py
