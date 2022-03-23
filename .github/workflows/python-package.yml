@@ -10,9 +10,9 @@ on:
 
 jobs:
     build-n-publish:
-    name: Build and publish Python distribution
-    runs-on: ubuntu-18.04
-    steps:
+      name: Build and publish Python distribution
+      runs-on: ubuntu-18.04
+      steps:
         - uses: actions/checkout@master
         - name: Initialize Python 3.7
         uses: actions/setup-python@v1
