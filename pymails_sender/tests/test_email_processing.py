@@ -1,13 +1,11 @@
 import pytest
 import csv
 import json
-import logging
 import socket
-from email_processing2 import EmailProcessor, PyMailer
+from ..email_processing import EmailProcessor, PyMailer
 
 _original_connect = socket.socket.connect
 false_directory = "false\\directory.fls"
-login = ['holaryc@gmail.com', 'Younghil']
 recipient_test_data_list = {'names': ['hilary', 'henry'], 'emails': ['hilary@email.ng', 'henry@email.com']}
 recipient_test_data = {'hilary': 'hil@email.ng', 'henry': 'henry@email.net'}
 recipient_file_data = [['hilary', 'hilary@email.ng', 'cc@email.net'],

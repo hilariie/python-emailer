@@ -9,17 +9,19 @@ from socket import gaierror
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
 from email import encoders
 from email.mime.image import MIMEImage
 
 
 class EmailProcessor:
-    def __init__(self):
-        pass
+    """This class houses methods which perform basic preprocessing tasks such as:
+    email_cleaner: Cleans email addresses
+    email_checker: Validates email addresses
+    email_content_file_reader: Reads email content from files
+    ..."""
 
-    @staticmethod
-    def email_cleaner(email_address):
+    # noinspection PyMethodMayBeStatic
+    def email_cleaner(self, email_address):
         """
         Tries to correct common mistakes in email addresses
         :param email_address :type string
@@ -44,8 +46,8 @@ class EmailProcessor:
 
         return email_address
 
-    @staticmethod
-    def email_checker(email_address):
+    # noinspection PyMethodMayBeStatic
+    def email_checker(self, email_address):
         """
         check for invalid email addresses
         :param email_address: :type string
@@ -58,8 +60,7 @@ class EmailProcessor:
         else:
             return False
 
-    @staticmethod
-    def email_content_file_reader(email_file):
+    def email_content_file_reader(self, email_file):
         """
         reads the html/txt file containing email content
         :param email_file directory to file containing email content
@@ -77,18 +78,27 @@ class EmailProcessor:
         :return: recipient data :type list
         """
         if type(recipients) is set:
-            # assume set/tuple has just emails
+            # set/tuple should have just emails
             return list(recipients)
         if type(recipients) is tuple:
-            # assume tuple has just emails
+            # tuple should have just emails
             return list(recipients)
         if type(recipients) is list:
             # list should hold just emails
             return recipients
         if type(recipients) is dict:
-            # dict should hold names as keys and emails as values
-            dict_data = self.recipient_dict_reader(recipients)
-            return dict_data
+            # loop through dictionary values and check if list is in dictionary
+            for _, data in recipients.items():
+                # if list is found, dictionary should be in below structure
+                # {names: [hilary, henry], emails: [hil@email.ng, henry@email.net], cc: [email1, email2]}
+                if type(data) is list:
+                    dict_data = self.recipient_dict_reader_list(recipients)
+                    return dict_data
+                else:
+                    # if list isn't found, dictionary should not hold cc and should be in below structure
+                    # {hilary: hil@email.ng, henry: henry@email.net]
+                    dict_data = self.recipient_dict_reader(recipients)
+                    return dict_data
         if type(recipients) is str:
             # Check if path is given
             file_checker = os.path.splitext(recipients)
@@ -100,12 +110,18 @@ class EmailProcessor:
                 # Read recipient data from json file
                 with open(recipients, 'r') as recip_data:
                     recip_json = json.load(recip_data)
-                # check for invalid data type
-                if type(recip_json) is not dict:
-                    raise TypeError(f"Expected dictionary, instead got {type(recipients)}")
-                # Read recipient data from json file
-                dict_data = self.recipient_dict_reader(recip_json)
-                return dict_data
+                # loop through dictionary values and check if list is in dictionary
+                for _, data in recip_json.items():
+                    # if list is found, dictionary should be in below structure
+                    # {names: [hilary, henry], emails: [hil@email.ng, henry@email.net]}
+                    if type(data) is list:
+                        dict_data = self.recipient_dict_reader_list(recip_json)
+                        return dict_data
+                    else:
+                        # if list isn't found, dictionary should be in below structure
+                        # {hilary: hil@email.ng, henry: henry@email.net]
+                        dict_data = self.recipient_dict_reader(recip_json)
+                        return dict_data
 
             # check for .csv extension
             elif file_checker[1] == '.csv':
@@ -118,10 +134,11 @@ class EmailProcessor:
         else:
             raise TypeError('email_recipient data should be in type: set, tuple, list, dict, str, or path')
 
-    @staticmethod
-    def recipient_dict_reader(dict_file):
+    # noinspection PyMethodMayBeStatic
+    def recipient_dict_reader(self, dict_file):
         """
-        Reads recipient data from dictionary
+        Reads recipient data from dictionary that holds names as keys and email as value
+        (i.e {'hilary':'hil@email.ng', 'henry': 'henry@email.net'}
         :param dict_file: recipient dictionary holding name as key and emails as values :type dict
         :return: names and emails as lists within a list
         """
@@ -129,23 +146,40 @@ class EmailProcessor:
         name = [names for names, _ in dict_file.items()]
         # get the values(emails)
         email = [emails for _, emails in dict_file.items()]
-        return [name] + [email]
+        return [name, email]
 
-    @staticmethod
-    def recipient_csv_reader(csv_file):
+    # noinspection PyMethodMayBeStatic
+    def recipient_dict_reader_list(self, dict_file):
+        """
+        Reads recipient data from dictionary that holds names and emails as lists
+        (i.e {'names':['hilary,'henry'], 'emails':['hil@email.ng', 'henry@email.net']}
+        :param dict_file: recipient dictionary
+        :return: names, emails and possibly cc as lists within a list
+        """
+        # length of dictionary should not be more than 3
+        # i.e {names:[], emails:[], cc:[]}
+        if len(dict_file) > 3:
+            raise ValueError('Recipient dictionary should contain not more than names, emails and cc keys')
+        d_list = []
+        for _, data in dict_file.items():
+            d_list += [data]
+        return d_list
+
+    # noinspection PyMethodMayBeStatic
+    def recipient_csv_reader(self, csv_file):
         """
         Reads recipient data from csv file
         :param csv_file: directory to csv file
         :return: list of recipient name, and/or emails, and/or cc emails
         """
         if os.path.exists(csv_file):
+            # read recipient data
             with open(csv_file, 'r') as recipients:
                 reader = csv.reader(recipients)
-                # extract recipient data
                 recipient_list = [lines for lines in reader]
             if len(recipient_list[0]) == 1:
                 print('found just emails')
-                # assume single column holds emails
+                # single column should hold just emails
                 # return list of email addresses excluding the header
                 return [''.join(emails) for emails in recipient_list][1:]
             elif len(recipient_list[0]) >= 2:
@@ -154,18 +188,26 @@ class EmailProcessor:
                 # Exclude the headers
                 name = [names[0] for names in recipient_list][1:]
                 email = [emails[1] for emails in recipient_list][1:]
-                try:
-                    # check for CC column
-                    cc_email = [cc_emails[2] for cc_emails in recipient_list][1:]
-                    return [name] + [email] + [cc_email]
-                except IndexError:
+                # check for CC column
+                cc_email = []
+                for cc_emails in recipient_list[1:]:
+                    # if length = 2, cc isn't available. Break out of loop.
+                    if len(recipient_list[1]) == 2:
+                        break
+                    # if length = 3, cc is avaiilable. append cc
+                    if len(cc_emails) == 3:
+                        cc_email.append(cc_emails[2])
+                # if cc list is empty, cc wasn't found.
+                if cc_email == []:
                     print(f'CC not found in {os.path.split(csv_file)[1]}')
                     return [name] + [email]
+                else:
+                    return [name] + [email] + [cc_email]
         else:
             raise FileNotFoundError(f'{csv_file} not found in directory')
 
-    @staticmethod
-    def file_attachments(path, message, names=None):
+    # noinspection PyMethodMayBeStatic
+    def file_attachments(self, path, message, names=None):
         """
         Attaches all files in a folder to the email message
         :param path: directory to folder containing email attachments
@@ -173,7 +215,6 @@ class EmailProcessor:
         :param names: preferred names of files - defaults to None :type list
         :return:
         """
-
         if os.path.isdir(path):
             # check if directory is empty
             if not os.listdir(path):
@@ -211,8 +252,8 @@ class EmailProcessor:
         else:
             raise FileNotFoundError(f"{path} doesn't exist")
 
-    @staticmethod
-    def smtp_checker(email_address):
+    # noinspection PyMethodMayBeStatic
+    def smtp_checker(self, email_address):
         """
         Checks email and returns appropriate smtp host
         :param email_address: sender email address :type str
@@ -220,10 +261,12 @@ class EmailProcessor:
         """
         if '@gmail' in email_address:
             return "smtp.gmail.com"
-        if '@hotmail' or '@outlook' in email_address:
+        if '@hotmail' in email_address or '@outlook' in email_address:
             return 'smtp-mail.outlook.com'
         if '@yahoo' in email_address:
             return "smtp.mail.yahoo.com"
+        else:
+            raise ValueError('Can\'t detect smtp host. Please provide smtp host.')
 
 
 class PyMailer(object):
@@ -241,6 +284,7 @@ class PyMailer(object):
         self.recipient_data, self.cc = self.email_receiver_processing()
         self.login = login
         self.subject = subject
+        # get message and message type
         self.message, self.message_type = self.email_body_processing(message)
 
     def email_receiver_processing(self):
@@ -248,13 +292,9 @@ class PyMailer(object):
         Checks if email recevier has name, recipient emails and cc emails based on length of email_receivers list
         :return: cc emails as list and dictionary holding recipient names and emails as keys and values
         """
-        print(self.email_receivers)
         cc = ''
-        print(len(self.email_receivers))
-        if len(self.email_receivers) == 1:
-            raise ValueError('Recipient data is empty')
         # check if email_receiver has just recipient email addresses
-        elif len(self.email_receivers) == 1:
+        if len(self.email_receivers) == 1:
             recipient_dict = {}
             for index, emails in enumerate(self.email_receivers):
                 recipient_dict[index] = emails
@@ -280,7 +320,7 @@ class PyMailer(object):
         :return:
         """
         # check if message is a file(directory)
-        if os.path.split(message)[0]:
+        if os.path.isfile(message):
             # get the extension (i.e .html, .txt, etc.)
             message_type = os.path.splitext(message)[1]
             # extract contents of the file
@@ -291,8 +331,6 @@ class PyMailer(object):
                 message_type = '.html'
             else:
                 message_type = '.txt'
-        else:
-            raise TypeError(f'email body should be file directory or str. Received type {type(message)}')
         return message, message_type
 
     def send_email(self, smtp=None, file_path=None, string_=None, cid_img=None):
@@ -317,7 +355,7 @@ class PyMailer(object):
         if cid_img:
             # call the function that displays attached images and exit afterwards.
             self.display_image(cid_img, smtp, message_type, sender_email, password, string_, file_path)
-            exit()
+            return
         # loop through recipient names and email addresses
         for name, emails in self.recipient_data.items():
             email_body = self.message
@@ -349,7 +387,7 @@ class PyMailer(object):
             # check if there are attachments
             if file_path:
                 # check if file_path is a directory
-                if not os.path.splitext(file_path)[1]:
+                if os.path.isdir(file_path):
                     # attach all the files in directory
                     self.email_processor.file_attachments(file_path, message)
                 # if file path to single fie is given, attach file to email
@@ -397,9 +435,11 @@ class PyMailer(object):
             msgRoot.attach(msg_alt)
 
             msg_alt.attach(MIMEText(email_body, message_type[1:]))
-            with open(file_path, 'rb') as attachments:
-                msg_img = MIMEImage(attachments.read())
-
+            try:
+                with open(file_path, 'rb') as attachments:
+                    msg_img = MIMEImage(attachments.read())
+            except PermissionError:
+                raise ValueError('Expected path to file, given directory instead')
             msg_img.add_header('Content-ID', f'<{cid}>')
             msgRoot.attach(msg_img)
 
@@ -418,7 +458,8 @@ class PyMailer(object):
         except(gaierror, ConnectionRefusedError):
             logging.error(f'Failed to connect to the server. Bad connection settings? Not sent to {name}, {emails}')
         except smtplib.SMTPServerDisconnected:
-            logging.error(f'Failed to connect to the server. Wrong username/password? Not sent to {name}, {emails}')
+            logging.error(f'Failed to connect to the server. Check smtp or username/password. Email Not sent to {name},'
+                          f' {emails}')
         except smtplib.SMTPException as e:
             if smtp:
                 logging.error(f'SMTP error occured: Check smtp domain name provided.\nError message: {e}')

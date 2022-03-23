@@ -1,1 +1,1 @@
-name = 'pymails'
+name = 'py-emailer'
