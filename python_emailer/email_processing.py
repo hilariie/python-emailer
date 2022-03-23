@@ -101,13 +101,16 @@ class EmailProcessor:
                     return dict_data
         if type(recipients) is str:
             file_checker = os.path.splitext(recipients)
-            # Check if path is given
-            # check if path is invalid
-            if os.path.isfile(recipients) and not os.path.exists(recipients):
+            if os.path.isdir(recipients):
+                raise ValueError(f"Expected recipient email address as string or path to file\
+                \nReceived path to directory instead")
+            # Check if path is given and not string
+            # Also check if path is invalid
+            if not os.path.isfile(recipients) and file_checker[1]:
                 raise FileNotFoundError(f"{recipients} doesn't exist")
 
             # check for .json extension
-            elif file_checker[1] == '.json':
+            if file_checker[1] == '.json':
                 # Read recipient data from json file
                 with open(recipients, 'r') as recip_data:
                     recip_json = json.load(recip_data)
@@ -133,7 +136,7 @@ class EmailProcessor:
             else:
                 return [recipients]
         else:
-            raise TypeError('email_recipient data should be in type: set, tuple, list, dict, str, or path')
+            raise TypeError('email_recipient data should be in type: set, tuple, list, dict, str, or path to file')
 
     # noinspection PyMethodMayBeStatic
     def recipient_dict_reader(self, dict_file):
