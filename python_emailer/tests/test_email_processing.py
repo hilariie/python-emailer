@@ -156,8 +156,8 @@ def test_email_content_reader(txt_file, html_file):
 def test_recipient_data(json_file, csv_file, csv_file_no_cc, json_file_list):
     ### Uncompleted Test function
     assert EmailProcessor().recipient_data(('email1', 'email2')) == ['email1', 'email2']
-    assert EmailProcessor().recipient_data({'email1', 'email2'}) == ['email1', 'email2']
-    assert EmailProcessor().recipient_data(['email2', 'email1']) == ['email2', 'email1']
+    assert 'email1' and 'email2' in EmailProcessor().recipient_data({'email1', 'email2'})
+    assert EmailProcessor().recipient_data(['email1', 'email2']) == ['email1', 'email2']
 
     assert EmailProcessor().recipient_data({'name': 'email1', 'name2': 'email2'}) == [['name', 'name2'], ['email1', 'email2']]
     assert EmailProcessor().recipient_data(recipient_test_data_list) == [['hilary', 'henry'], ['hilary@email.ng', 'henry@email.com']]
