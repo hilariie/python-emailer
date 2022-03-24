@@ -52,4 +52,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.test_pypi_password }}
-          repository_url: https://pypi.org/project/python-emailer/
+          repository_url: https://upload.pypi.org/legacy/
