@@ -21,9 +21,10 @@ class EmailProcessor:
     ..."""
 
     # noinspection PyMethodMayBeStatic
-    def email_cleaner(self, email_address):
+    def email_cleaner(self, email_address: str) -> str:
         """
         Tries to correct common mistakes in email addresses
+
         :param email_address :type string
         :return: corrected email address :type string
         """
@@ -47,9 +48,10 @@ class EmailProcessor:
         return email_address
 
     # noinspection PyMethodMayBeStatic
-    def email_checker(self, email_address):
+    def email_checker(self, email_address: str) -> bool:
         """
         check for invalid email addresses
+
         :param email_address: :type string
         :return: True or False :type boolean
         """
@@ -60,9 +62,10 @@ class EmailProcessor:
         else:
             return False
 
-    def email_content_file_reader(self, email_file):
+    def email_content_file_reader(self, email_file) -> str:
         """
         reads the html/txt file containing email content
+
         :param email_file directory to file containing email content
         :return: email content :type str
         """
@@ -71,22 +74,20 @@ class EmailProcessor:
             email_content = ''.join(email_content)
         return email_content
 
-    def recipient_data(self, recipients):
+    def recipient_data(self, recipients) -> list:
         """
         Get recipient data and return it as list
+
         :param recipients: receiver email addresses :type set, tuple, list, dict, str, .csv
         :return: recipient data :type list
         """
-        if type(recipients) is set:
-            # set/tuple should have just emails
+        # check if the recipient is a set, tuple or list
+        file_condition = type(recipients) in [set, tuple, list]
+        conditional = (file_condition,)
+        if any(conditional):
             return list(recipients)
-        if type(recipients) is tuple:
-            # tuple should have just emails
-            return list(recipients)
-        if type(recipients) is list:
-            # list should hold just emails
-            return recipients
-        if type(recipients) is dict:
+
+        elif type(recipients) is dict:
             # loop through dictionary values and check if list is in dictionary
             for _, data in recipients.items():
                 # if list is found, dictionary should be in below structure
@@ -99,7 +100,8 @@ class EmailProcessor:
                     # {hilary: hil@email.ng, henry: henry@email.net]
                     dict_data = self.recipient_dict_reader(recipients)
                     return dict_data
-        if type(recipients) is str:
+
+        elif type(recipients) is str:
             file_checker = os.path.splitext(recipients)
             if os.path.isdir(recipients):
                 raise ValueError(f"Expected recipient email address as string or path to file\
@@ -139,10 +141,11 @@ class EmailProcessor:
             raise TypeError('email_recipient data should be in type: set, tuple, list, dict, str, or path to file')
 
     # noinspection PyMethodMayBeStatic
-    def recipient_dict_reader(self, dict_file):
+    def recipient_dict_reader(self, dict_file: dict) -> list:
         """
         Reads recipient data from dictionary that holds names as keys and email as value
-        (i.e {'hilary':'hil@email.ng', 'henry': 'henry@email.net'}
+        (i.e {'hilary':'hil@email.ng', 'henry': 'henry@email.net'})
+
         :param dict_file: recipient dictionary holding name as key and emails as values :type dict
         :return: names and emails as lists within a list
         """
@@ -153,10 +156,11 @@ class EmailProcessor:
         return [name, email]
 
     # noinspection PyMethodMayBeStatic
-    def recipient_dict_reader_list(self, dict_file):
+    def recipient_dict_reader_list(self, dict_file: dict) -> list:
         """
         Reads recipient data from dictionary that holds names and emails as lists
-        (i.e {'names':['hilary,'henry'], 'emails':['hil@email.ng', 'henry@email.net']}
+        (i.e {'names':['hilary,'henry'], 'emails':['hil@email.ng', 'henry@email.net']})
+
         :param dict_file: recipient dictionary
         :return: names, emails and possibly cc as lists within a list
         """
@@ -164,9 +168,9 @@ class EmailProcessor:
         # i.e {names:[], emails:[], cc:[]}
         if len(dict_file) > 3:
             raise ValueError('Recipient dictionary should contain not more than names, emails and cc keys')
-        d_list = []
-        for _, data in dict_file.items():
-            d_list += [data]
+        
+        # make a list of lists grouped by name, email and CC
+        d_list = [data for _, data in dict_file.items()]
         return d_list
 
     # noinspection PyMethodMayBeStatic
@@ -198,7 +202,7 @@ class EmailProcessor:
                     # if length = 2, cc isn't available. Break out of loop.
                     if len(recipient_list[1]) == 2:
                         break
-                    # if length = 3, cc is avaiilable. append cc
+                    # if length = 3, cc is available. append cc
                     if len(cc_emails) == 3:
                         cc_email.append(cc_emails[2])
                 # if cc list is empty, cc wasn't found.
@@ -257,7 +261,7 @@ class EmailProcessor:
             raise FileNotFoundError(f"{path} doesn't exist")
 
     # noinspection PyMethodMayBeStatic
-    def smtp_checker(self, email_address):
+    def smtp_checker(self, email_address: str) -> str:
         """
         Checks email and returns appropriate smtp host
         :param email_address: sender email address :type str
@@ -337,7 +341,7 @@ class PyMailer(object):
                 message_type = '.txt'
         return message, message_type
 
-    def send_email(self, smtp=None, file_path=None, string_=None, cid_img=None):
+    def send_email(self, smtp=None, file_path=None, greeting=None, cid_img=None):
         """
         :param smtp: smtp host. If left empty, method attempts to detect smtp host from sender email address :type str
         :param file_path: directory to file or folder containing ONLY files to be attached :type os.path
@@ -358,7 +362,7 @@ class PyMailer(object):
         # check if user wishes to display attached image in email
         if cid_img:
             # call the function that displays attached images and exit afterwards.
-            self.display_image(cid_img, smtp, message_type, sender_email, password, string_, file_path)
+            self.display_image(cid_img, smtp, message_type, sender_email, password, greeting, file_path)
             return
         # loop through recipient names and email addresses
         for name, emails in self.recipient_data.items():
@@ -374,10 +378,10 @@ class PyMailer(object):
                 continue
 
             # check if introductory string is given (e.g Hello, Hi, Dear, etc.)
-            if string_:
+            if greeting:
                 # check for first appearance of string in email body
-                index = email_body.index(string_)
-                index = index + len(string_)
+                index = email_body.index(greeting)
+                index = index + len(greeting)
                 # add recipient name after introductory word (i.e Hello <recipient name>)
                 email_body = email_body[:index] + f' {name}' + email_body[index:]
 
@@ -408,7 +412,7 @@ class PyMailer(object):
             receiver_emails = [self.cc] + [emails]
             self.initiate_email(smtp, receiver_emails, message, sender_email, password, name, emails)
 
-    def display_image(self, cid, smtp, message_type, sender_email, password, string_, file_path):
+    def display_image(self, cid, smtp, message_type, sender_email, password, greeting, file_path):
         if not os.path.exists(file_path):
             raise FileNotFoundError(f'No such file or directory: {file_path}')
         for name, emails in self.recipient_data.items():
@@ -423,10 +427,10 @@ class PyMailer(object):
                 print(f"{name}'s email address: {emails} is invalid and has been dropped")
                 continue
             # check if introductory string is given (e.g Hello, Hi, Dear, etc.)
-            if string_:
+            if greeting:
                 # check for first appearance of string in email body
-                index = email_body.index(string_)
-                index = index + len(string_)
+                index = email_body.index(greeting)
+                index = index + len(greeting)
                 # add recipient name after introductory word (i.e Hello <recipient name>)
                 email_body = email_body[:index] + f' {name}' + email_body[index:]
 
