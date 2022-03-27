@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='python_emailer',
-    version='1.5.2',
+    version='1.5.3',
     author='Akpu Chukwuma Hilary Jnr',
     author_email='holaryc@gmail.com',
     description='Package that aids in sending emails to recipient(s)',
