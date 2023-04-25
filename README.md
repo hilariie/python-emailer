@@ -1,5 +1,17 @@
-# python-emailer
-python-emailer: a python emailing toolkit
+<div align="center">
+  
+  <h1>
+    python-emailer
+    <img src="https://cdn.pixabay.com/photo/2016/06/13/17/30/mail-1454731__340.png" width="40"/>
+  </h1>
+</div>
+<div align="center">
+  <a href="https://pepy.tech/project/python-emailer"><img src="https://static.pepy.tech/badge/python-emailer" alt="Downloads"></a>
+  <a href="https://pepy.tech/project/python-emailer"><img src="https://static.pepy.tech/badge/python-emailer/month" alt="Downloads per month"></a>
+  <a href="https://pepy.tech/project/python-emailer"><img src="https://static.pepy.tech/badge/python-emailer/week" alt="Downloads per week"></a>
+</div>
+<!-- python-emailer: a python emailing toolkit -->
+
 
 ## What is it?
 python-emailer is a Python package that aids in sending of emails. It is a robust package which aims to cover every aspect of sending emails thereby, helping developers code less.
